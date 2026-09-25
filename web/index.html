@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>{{TITLE}}</title>
+<link rel="icon" href="/.sf/icon.svg?v={{V}}" type="image/svg+xml">
+<link rel="stylesheet" href="/.sf/app.css?v={{V}}">
+<script>try{var t=localStorage.getItem('sf.theme');if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 7.5A2.5 2.5 0 0 1 5.5 5h3.6a2 2 0 0 1 1.4.6L12 7h6.5A2.5 2.5 0 0 1 21 9.5v8a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 17.5z"/></symbol>
+    <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></symbol>
+    <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="1.8"/><path d="m21 15-4.5-4.5L6 21"/></symbol>
+    <symbol id="i-video" viewBox="0 0 24 24"><rect x="2.5" y="5" width="14" height="14" rx="2.5"/><path d="m16.5 10 5-3v10l-5-3"/></symbol>
+    <symbol id="i-audio" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></symbol>
+    <symbol id="i-code" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="m10 12-2 2 2 2m4-4 2 2-2 2"/></symbol>
+    <symbol id="i-text" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></symbol>
+    <symbol id="i-archive" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="5" rx="1.5"/><path d="M5 9v9a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V9M10 13h4"/></symbol>
+    <symbol id="i-pdf" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M8.5 16.5h7M8.5 13h4"/></symbol>
+    <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 15V4m0 0L7.5 8.5M12 4l4.5 4.5"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></symbol>
+    <symbol id="i-folder-plus" viewBox="0 0 24 24"><path d="M3 7.5A2.5 2.5 0 0 1 5.5 5h3.6a2 2 0 0 1 1.4.6L12 7h6.5A2.5 2.5 0 0 1 21 9.5v8a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 17.5z"/><path d="M12 10.5v6M9 13.5h6"/></symbol>
+    <symbol id="i-folder-up" viewBox="0 0 24 24"><path d="M3 7.5A2.5 2.5 0 0 1 5.5 5h3.6a2 2 0 0 1 1.4.6L12 7h6.5A2.5 2.5 0 0 1 21 9.5v8a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 17.5z"/><path d="M12 17v-6m0 0-2.5 2.5M12 11l2.5 2.5"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></symbol>
+    <symbol id="i-pencil" viewBox="0 0 24 24"><path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16z"/><path d="m13.5 6.5 4 4"/></symbol>
+    <symbol id="i-move" viewBox="0 0 24 24"><path d="M3 7.5A2.5 2.5 0 0 1 5.5 5h3.6a2 2 0 0 1 1.4.6L12 7h6.5A2.5 2.5 0 0 1 21 9.5v8a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 17.5z"/><path d="M9 13.5h6m0 0-2.5-2.5m2.5 2.5L12.5 16"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/></symbol>
+    <symbol id="i-grid" viewBox="0 0 24 24"><rect x="4" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5"/></symbol>
+    <symbol id="i-list" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11M4.5 6h.01M4.5 12h.01M4.5 18h.01"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+    <symbol id="i-left" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+    <symbol id="i-right" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+    <symbol id="i-up" viewBox="0 0 24 24"><path d="m6 15 6-6 6 6"/></symbol>
+    <symbol id="i-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></symbol>
+    <symbol id="i-logout" viewBox="0 0 24 24"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 16l-4-4 4-4M6 12h10"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4.5v15l12.5-7.5z" fill="currentColor"/></symbol>
+    <symbol id="i-pause" viewBox="0 0 24 24"><rect x="6" y="4.5" width="4" height="15" rx="1" fill="currentColor"/><rect x="14" y="4.5" width="4" height="15" rx="1" fill="currentColor"/></symbol>
+    <symbol id="i-prev" viewBox="0 0 24 24"><path d="M18 5v14L8 12z" fill="currentColor"/><path d="M6 5v14"/></symbol>
+    <symbol id="i-next" viewBox="0 0 24 24"><path d="M6 5v14l10-7z" fill="currentColor"/><path d="M18 5v14"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+    <symbol id="i-more" viewBox="0 0 24 24"><circle cx="12" cy="5.5" r="1.3" fill="currentColor"/><circle cx="12" cy="12" r="1.3" fill="currentColor"/><circle cx="12" cy="18.5" r="1.3" fill="currentColor"/></symbol>
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="M3.5 11 12 4l8.5 7M6 9.5V19a1 1 0 0 0 1 1h3.5v-5h3v5H17a1 1 0 0 0 1-1V9.5"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4.5" y="10.5" width="15" height="10" rx="2.5"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/></symbol>
+    <symbol id="i-external" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4"/></symbol>
+    <symbol id="i-inbox" viewBox="0 0 24 24"><path d="M3 13h5l1.5 3h5L16 13h5"/><path d="M5.5 5h13L21 13v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-5z"/></symbol>
+  </defs>
+</svg>
+
+<header class="topbar">
+  <a class="brand" href="/" data-nav="/">
+    <img src="/.sf/icon.svg?v={{V}}" alt="" width="28" height="28">
+    <span class="brand-name">{{TITLE}}</span>
+  </a>
+  <label class="search">
+    <svg class="ic"><use href="#i-search"/></svg>
+    <input id="search" type="search" placeholder="Search this folder" autocomplete="off" spellcheck="false">
+    <kbd>/</kbd>
+  </label>
+  <div class="top-actions">
+    <button class="icon-btn" id="theme-btn" title="Toggle theme"><svg class="ic"><use href="#i-moon"/></svg></button>
+    <div id="account"></div>
+  </div>
+</header>
+
+<main class="page">
+  <div class="bar">
+    <nav class="crumbs" id="crumbs" aria-label="Breadcrumb"></nav>
+    <div class="tools" id="tools">
+      <button class="btn primary" id="upload-btn" hidden><svg class="ic"><use href="#i-upload"/></svg><span>Upload</span></button>
+      <button class="btn" id="mkdir-btn" hidden><svg class="ic"><use href="#i-folder-plus"/></svg><span>New folder</span></button>
+      <div class="menu-wrap">
+        <button class="icon-btn" id="more-btn" title="More"><svg class="ic"><use href="#i-more"/></svg></button>
+      </div>
+      <div class="seg" role="group" aria-label="View">
+        <button class="icon-btn" data-view="list" title="List view"><svg class="ic"><use href="#i-list"/></svg></button>
+        <button class="icon-btn" data-view="grid" title="Grid view"><svg class="ic"><use href="#i-grid"/></svg></button>
+      </div>
+    </div>
+    <div class="selbar" id="selbar" hidden>
+      <button class="icon-btn" id="sel-clear" title="Clear selection"><svg class="ic"><use href="#i-x"/></svg></button>
+      <span id="sel-count"></span>
+      <span class="grow"></span>
+      <button class="btn ghost" data-act="download"><svg class="ic"><use href="#i-download"/></svg><span>Download</span></button>
+      <button class="btn ghost" data-act="rename"><svg class="ic"><use href="#i-pencil"/></svg><span>Rename</span></button>
+      <button class="btn ghost" data-act="move"><svg class="ic"><use href="#i-move"/></svg><span>Move</span></button>
+      <button class="btn ghost danger" data-act="delete"><svg class="ic"><use href="#i-trash"/></svg><span>Delete</span></button>
+    </div>
+  </div>
+
+  <section id="view" class="view" aria-live="polite"></section>
+  <p class="summary" id="summary"></p>
+</main>
+
+<div class="drop-overlay" id="drop"><div class="drop-card"><svg class="ic"><use href="#i-upload"/></svg><strong>Drop to upload</strong><span id="drop-dest"></span></div></div>
+
+<aside class="uploads" id="uploads" hidden>
+  <header><strong id="up-title">Uploading</strong><span class="grow"></span>
+    <button class="icon-btn sm" id="up-toggle" title="Collapse"><svg class="ic"><use href="#i-down"/></svg></button>
+    <button class="icon-btn sm" id="up-close" title="Close"><svg class="ic"><use href="#i-x"/></svg></button></header>
+  <div class="up-total"><div id="up-total-bar"></div></div>
+  <ul id="up-list"></ul>
+</aside>
+
+<div class="player" id="player" hidden>
+  <div class="pl-info"><div class="pl-art"><svg class="ic"><use href="#i-audio"/></svg></div><div class="pl-text"><strong id="pl-title"></strong><span id="pl-sub"></span></div></div>
+  <div class="pl-main">
+    <div class="pl-ctrls">
+      <button class="icon-btn" id="pl-prev" title="Previous"><svg class="ic"><use href="#i-prev"/></svg></button>
+      <button class="icon-btn pl-play" id="pl-play" title="Play/Pause"><svg class="ic"><use href="#i-pause"/></svg></button>
+      <button class="icon-btn" id="pl-next" title="Next"><svg class="ic"><use href="#i-next"/></svg></button>
+    </div>
+    <div class="pl-seek"><span id="pl-cur">0:00</span><input type="range" id="pl-range" min="0" max="1000" value="0"><span id="pl-dur">0:00</span></div>
+  </div>
+  <button class="icon-btn" id="pl-close" title="Close player"><svg class="ic"><use href="#i-x"/></svg></button>
+  <audio id="audio" preload="metadata"></audio>
+</div>
+
+<div class="viewer" id="viewer" hidden>
+  <header>
+    <div class="v-title"><strong id="v-name"></strong><span id="v-meta"></span></div>
+    <span class="grow"></span>
+    <a class="icon-btn" id="v-open" target="_blank" rel="noopener" title="Open in new tab"><svg class="ic"><use href="#i-external"/></svg></a>
+    <a class="icon-btn" id="v-dl" title="Download"><svg class="ic"><use href="#i-download"/></svg></a>
+    <button class="icon-btn" id="v-close" title="Close (Esc)"><svg class="ic"><use href="#i-x"/></svg></button>
+  </header>
+  <button class="v-nav prev" id="v-prev" title="Previous"><svg class="ic"><use href="#i-left"/></svg></button>
+  <div class="v-body" id="v-body"></div>
+  <button class="v-nav next" id="v-next" title="Next"><svg class="ic"><use href="#i-right"/></svg></button>
+</div>
+
+<div class="menu" id="menu" hidden></div>
+<div class="toasts" id="toasts"></div>
+<input type="file" id="file-input" multiple hidden>
+<input type="file" id="dir-input" webkitdirectory multiple hidden>
+
+<script src="/.sf/app.js?v={{V}}"></script>
+</body>
+</html>
