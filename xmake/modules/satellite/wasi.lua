@@ -1,12 +1,5 @@
--- Build settings for the selected WASI version (`xmake f --wasi=p3|p2`).
+-- Build settings for the WASIp3 component (rustc's tier-3 wasm32-wasip3 target).
 function settings()
-    if get_config("wasi") == "p2" then
-        return {
-            cargo = {"build", "--target", "wasm32-wasip2", "--release"},
-            wasm = "target/wasm32-wasip2/release/satellite.wasm",
-            wasmtime_flags = {},
-        }
-    end
     return {
         cargo = {"+nightly", "build", "-Zbuild-std=std,panic_abort", "--target", "wasm32-wasip3", "--release"},
         wasm = "target/wasm32-wasip3/release/satellite.wasm",

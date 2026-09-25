@@ -1,11 +1,10 @@
 -- Satellite Files build with xmake.
 --
---   xmake                 build (WASIp3 by default)
+--   xmake                 build the WASIp3 component
 --   xmake package         build dist/files.satellite for planet
 --   xmake run             build and serve on http://127.0.0.1:8080
 --   xmake e2e             run the end-to-end tests (needs curl and tar)
 --   xmake sysroot ...     rebuild the WASIp3 C runtime in vendor/wasip3-sysroot (clang >= 23)
---   xmake f --wasi=p2     switch to the wasm32-wasip2 build (stable Rust)
 --   xmake f --addr=0.0.0.0:8080 --data=/srv/files --title="My Files" --accounts=alice:secret
 --
 -- The WASIp3 build uses rustc's tier-3 wasm32-wasip3 target: nightly Rust with
@@ -15,13 +14,6 @@
 
 set_project("satellite-files")
 set_version("0.1.0")
-
-option("wasi")
-    set_default("p3")
-    set_values("p3", "p2")
-    set_showmenu(true)
-    set_description("WASI version to build for: p3 (wasm32-wasip3, nightly) or p2 (wasm32-wasip2, stable)")
-option_end()
 
 option("addr")
     set_default("127.0.0.1:8080")
@@ -62,11 +54,7 @@ target("satellite")
     on_build(function (target)
         local build = import("satellite.wasi").settings()
         os.cd(os.projectdir())
-        if get_config("wasi") == "p2" then
-            os.execv("rustup", {"target", "add", "wasm32-wasip2"})
-        else
-            import("satellite.runtime").install()
-        end
+        import("satellite.runtime").install()
         os.execv("cargo", build.cargo)
         cprint("${bright green}built${clear} %s", build.wasm)
     end)
@@ -104,11 +92,6 @@ target("satellite")
     on_package(function (target)
         import("utils.archive")
         os.cd(os.projectdir())
-        -- planet's wasmtime handler links WASIp3 only; the p2 build does its
-        -- file I/O through WASIp2 and would not instantiate there.
-        if get_config("wasi") == "p2" then
-            raise("planet runs the WASIp3 build only -- `xmake f --wasi=p3` first")
-        end
         local build = import("satellite.wasi").settings()
         if not os.isfile(build.wasm) then
             raise("component not built at %s -- run `xmake` first", build.wasm)
@@ -158,7 +141,7 @@ task("e2e")
     end)
     set_menu {
         usage = "xmake e2e [options]",
-        description = "Build, then run the end-to-end tests against the selected WASI build",
+        description = "Build, then run the end-to-end tests against the component",
         options = {
             {nil, "keep", "k", nil, "Keep the temporary directory with the test data."},
             {nil, "port", "kv", "18080", "Port for the test server."},

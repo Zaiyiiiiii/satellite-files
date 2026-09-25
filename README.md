@@ -43,7 +43,7 @@ Satellite Files 是一个类似 [copyparty](https://github.com/9001/copyparty) �
 - [wasmtime](https://wasmtime.dev)：开发时使用 49.0.1
 - [xmake](https://xmake.io)：构建、运行和测试，Linux、macOS、Windows 都能用
 
-默认构建的是纯 WASIp3 组件（`wasm32-wasip3`）。
+只构建纯 WASIp3 组件（`wasm32-wasip3`），组件里只有 `@0.3.0` 的 WASI 接口。
 
 ```sh
 xmake                    # 构建
@@ -53,7 +53,6 @@ xmake e2e                # 端到端测试
 
 xmake f --addr=0.0.0.0:8080 --data=/srv/files --title="My Files" --accounts=alice:secret
 xmake f --access="/:*=r,@acct=rwmd;/inbox:*=w,alice=rwmd"
-xmake f --wasi=p2        # 切换到 wasm32-wasip2 构建（stable Rust）
 ```
 
 `SATELLITE_SECRET`、`SATELLITE_MAX_UPLOAD`、`SATELLITE_DEBUG` 如果在当前环境里设置了，`xmake run` 会原样传给组件。
@@ -107,7 +106,7 @@ wasmtime serve -Scli -Sp3 -Wcomponent-model-threading=y \
 
 ### 部署到 planet
 
-`xmake package` 生成 `dist/files.satellite`（只支持 WASIp3 构建），放进 planet 即可。清单见 `manifest.yaml`：
+`xmake package` 生成 `dist/files.satellite`，放进 planet 即可。清单见 `manifest.yaml`：
 
 - 服务 `server`，wasmtime handler，常驻实例（`http-resident`）
 - `http`：Web 界面和上传/下载接口共用的端口
