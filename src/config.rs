@@ -9,7 +9,7 @@
 //! * `SF_SECRET`   – key used to sign session cookies.
 //! * `SF_MAX_UPLOAD` – optional upload size limit in MiB (0 = unlimited).
 
-use hmac::{Hmac, Mac};
+use hmac::{Hmac, KeyInit, Mac};
 use sha2::{Digest, Sha256};
 
 type HmacSha256 = Hmac<Sha256>;

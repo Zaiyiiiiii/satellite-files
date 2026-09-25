@@ -16,11 +16,11 @@
 
 ## 构建与运行
 
-需要 Rust（`wasm32-wasip2` target）和 wasmtime ≥ 47：
+需要 Rust ≥ 1.98（`wasm32-wasip2` target，仓库内的 `rust-toolchain.toml` 会自动选用）和 wasmtime ≥ 49：
 
 ```sh
 rustup target add wasm32-wasip2
-cargo install wasmtime-cli --locked   # 或下载预编译版本
+cargo install wasmtime-cli --version 49.0.1 --locked   # 或下载预编译版本
 
 ./serve.sh ./data 127.0.0.1:8080
 ```
