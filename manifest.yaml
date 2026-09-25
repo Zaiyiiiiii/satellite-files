@@ -21,7 +21,7 @@ services:
       # 组件把它作为根卷对外提供。
       - id: data
         type: path
-        source: private
+        source: user
         access: read-write
         presentation:
           description: 对外提供的文件都在这个目录里，丢了就等于丢了所有文件
