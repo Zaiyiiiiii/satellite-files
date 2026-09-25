@@ -95,10 +95,10 @@ local function start_server(wasm, flags, port)
     table.join2(args, flags)
     table.join2(args, {
         "--addr", "127.0.0.1:" .. port,
-        "--env", "SATELLITE_TITLE=E2E Files",
-        "--env", "SATELLITE_ACCOUNTS=alice:secret,bob:hunter2",
-        "--env", "SATELLITE_ACCESS=/:*=r,@acct=rw,alice=rwmd;/inbox:*=w,alice=rwmd;/private:alice=rwmd",
-        "--env", "SATELLITE_MAX_UPLOAD=8",
+        "--env", "FILES_TITLE=E2E Files",
+        "--env", "FILES_ACCOUNTS=alice:secret,bob:hunter2",
+        "--env", "FILES_ACCESS=/:*=r,@acct=rw,alice=rwmd;/inbox:*=w,alice=rwmd;/private:alice=rwmd",
+        "--env", "FILES_MAX_UPLOAD=8",
         "--dir", DATA .. "::/mnt/data",
         wasm,
     })
@@ -116,12 +116,12 @@ end
 
 local function run_checks()
     -- --- web UI and static assets ----------------------------------------------------
-    check(web("GET", "/") == "200", "GET /"); body_has("<title>E2E Files</title>"); body_has("/.sf/app.js")
-    check(web("GET", "/.sf/app.js") == "200", "app.js")
-    check(web("GET", "/.sf/app.css") == "200", "app.css")
-    local etag = headers("/.sf/app.js"):match("etag: (%S+)")
+    check(web("GET", "/") == "200", "GET /"); body_has("<title>E2E Files</title>"); body_has("/.files/app.js")
+    check(web("GET", "/.files/app.js") == "200", "app.js")
+    check(web("GET", "/.files/app.css") == "200", "app.css")
+    local etag = headers("/.files/app.js"):match("etag: (%S+)")
     check(etag ~= nil, "assets carry an etag")
-    check(web("GET", "/.sf/app.js", "-H", "If-None-Match: " .. etag) == "304", "asset revalidation")
+    check(web("GET", "/.files/app.js", "-H", "If-None-Match: " .. etag) == "304", "asset revalidation")
     ok("web UI and static assets")
 
     -- --- anonymous access and sign-in -----------------------------------------------------
@@ -131,11 +131,11 @@ local function run_checks()
     local small = path.join(TMP, "small.txt")
     write_file(small, "small\n")
     check(web("PUT", "/x.txt", {anon = true}, "--data-binary", "@" .. small) == "401", "anonymous upload must be refused")
-    check(web("POST", "/.sf/login", {raw = true}, "-d", '{"user":"alice","pass":"secret"}') == "403", "mutations need X-Requested-With")
-    check(web("POST", "/.sf/login", "-d", '{"user":"alice","pass":"wrong"}') == "401", "wrong password")
-    check(web("POST", "/.sf/login", "-d", '{"user":"alice","pass":"secret"}') == "200", "sign in")
-    check(web("GET", "/.sf/me") == "200", "me"); body_has('"user":"alice"')
-    check(web("GET", "/.sf/me", {anon = true}, "-b", "sf_session=616c696365.9999999999.00") == "200", "forged session")
+    check(web("POST", "/.files/login", {raw = true}, "-d", '{"user":"alice","pass":"secret"}') == "403", "mutations need X-Requested-With")
+    check(web("POST", "/.files/login", "-d", '{"user":"alice","pass":"wrong"}') == "401", "wrong password")
+    check(web("POST", "/.files/login", "-d", '{"user":"alice","pass":"secret"}') == "200", "sign in")
+    check(web("GET", "/.files/me") == "200", "me"); body_has('"user":"alice"')
+    check(web("GET", "/.files/me", {anon = true}, "-b", "files_session=616c696365.9999999999.00") == "200", "forged session")
     body_has('"user":null')
     ok("anonymous access, sign-in and forged sessions")
 
@@ -159,19 +159,19 @@ local function run_checks()
     ok("upload, download, ranges and overwrite")
 
     -- Permissions on overwrite, size limit, unicode names, temp files.
-    check(web("POST", "/.sf/login", "-d", '{"user":"bob","pass":"hunter2"}') == "200", "sign in as bob")
+    check(web("POST", "/.files/login", "-d", '{"user":"bob","pass":"hunter2"}') == "200", "sign in as bob")
     check(web("PUT", "/docs/bob.txt", "--data-binary", "@" .. small) == "201", "bob may upload")
     check(web("PUT", "/docs/bob.txt?overwrite", "--data-binary", "@" .. small) == "403", "overwrite needs delete permission")
     check(web("DELETE", "/docs/bob.txt") == "403", "bob may not delete")
     check(web("GET", "/private/?ls") == "403", "bob may not list /private")
-    check(web("POST", "/.sf/login", "-d", '{"user":"alice","pass":"secret"}') == "200", "sign in as alice again")
+    check(web("POST", "/.files/login", "-d", '{"user":"alice","pass":"secret"}') == "200", "sign in as alice again")
     local huge = path.join(TMP, "huge.bin")
     write_file(huge, payload(9 * 1024 * 1024, 3))
     check(web("PUT", "/docs/huge.bin", "--data-binary", "@" .. huge) == "413", "upload limit")
     check(web("PUT", "/%E4%B8%AD%E6%96%87%20%E7%9B%AE%E5%BD%95/%E7%AC%94%E8%AE%B0.txt", "--data-binary", "@" .. small) == "201", "unicode upload")
     check(os.isfile(path.join(DATA, "中文 目录", "笔记.txt")), "unicode file on disk")
-    check(web("PUT", "/docs/x.sfpart", "--data-binary", "@" .. small) == "400", "reserved temp suffix")
-    local leftovers = os.files(path.join(DATA, "docs", "**.sfpart"))
+    check(web("PUT", "/docs/x.filespart", "--data-binary", "@" .. small) == "400", "reserved temp suffix")
+    local leftovers = os.files(path.join(DATA, "docs", "**.filespart"))
     check(#leftovers == 0, "no temp files left behind")
     ok("permissions, upload limit, unicode names and temp files")
 
@@ -246,8 +246,8 @@ local function run_checks()
     check(not os.isdir(path.join(DATA, "songs")), "folder gone")
     check(web("GET", "/songs/hi.txt") == "404", "deleted file 404")
     check(web("DELETE", "/") == "403", "root cannot be deleted")
-    check(web("POST", "/.sf/logout") == "200", "sign out")
-    check(web("GET", "/.sf/me") == "200", "me after sign out"); body_has('"user":null')
+    check(web("POST", "/.files/logout") == "200", "sign out")
+    check(web("GET", "/.files/me") == "200", "me after sign out"); body_has('"user":null')
     ok("delete and sign out")
 end
 
@@ -255,7 +255,7 @@ function main(wasm, flags, opt)
     opt = opt or {}
     local port = opt.port or 18080
     B = "http://127.0.0.1:" .. port
-    TMP = path.join(os.tmpdir(), "satellite-files-e2e-" .. os.time() .. "-" .. math.random(100000))
+    TMP = path.join(os.tmpdir(), "files-e2e-" .. os.time() .. "-" .. math.random(100000))
     DATA = path.join(TMP, "data")
     JAR = path.join(TMP, "cookies")
     os.mkdir(DATA)

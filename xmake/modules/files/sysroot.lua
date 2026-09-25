@@ -80,7 +80,7 @@ function main(opt)
     os.execv("ninja", {"-C", build, "install"})
 
     -- 3. Update the vendored copy and install it into the toolchain.
-    local runtime = import("satellite.runtime")
+    local runtime = import("files.runtime")
     local libdir = path.join(sysroot, "lib", "wasm32-wasip3")
     for _, name in ipairs({"crt1-command.o", "crt1-reactor.o", "libc.a"}) do
         os.cp(path.join(libdir, name), path.join(runtime.vendored_dir(), name))

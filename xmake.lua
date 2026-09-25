@@ -1,4 +1,4 @@
--- Satellite Files build with xmake.
+-- Files build with xmake.
 --
 --   xmake                 build the WASIp3 component
 --   xmake package         build dist/files.satellite for planet
@@ -12,7 +12,7 @@
 -- vendor/wasip3-sysroot. Its cooperative-threads ABI needs wasmtime's
 -- `-Wcomponent-model-threading=y`, which `xmake run` passes.
 
-set_project("satellite-files")
+set_project("files")
 set_version("0.1.0")
 
 option("addr")
@@ -30,37 +30,37 @@ option_end()
 option("title")
     set_default("")
     set_showmenu(true)
-    set_description("Site name shown in the UI (SATELLITE_TITLE, default: Satellite)")
+    set_description("Site name shown in the UI (FILES_TITLE, default: Files)")
 option_end()
 
 option("accounts")
     set_default("")
     set_showmenu(true)
-    set_description("Accounts as user:password,user:password (SATELLITE_ACCOUNTS, default: none, everyone may read and write)")
+    set_description("Accounts as user:password,user:password (FILES_ACCOUNTS, default: none, everyone may read and write)")
 option_end()
 
 option("access")
     set_default("")
     set_showmenu(true)
-    set_description("Access rules, e.g. \"/:*=r,@acct=rwmd\" (SATELLITE_ACCESS)")
+    set_description("Access rules, e.g. \"/:*=r,@acct=rwmd\" (FILES_ACCESS)")
 option_end()
 
 add_moduledirs("xmake/modules")
 
-target("satellite")
+target("files")
     set_kind("phony")
     set_default(true)
 
     on_build(function (target)
-        local build = import("satellite.wasi").settings()
+        local build = import("files.wasi").settings()
         os.cd(os.projectdir())
-        import("satellite.runtime").install()
+        import("files.runtime").install()
         os.execv("cargo", build.cargo)
         cprint("${bright green}built${clear} %s", build.wasm)
     end)
 
     on_run(function (target)
-        local build = import("satellite.wasi").settings()
+        local build = import("files.wasi").settings()
         os.cd(os.projectdir())
         local addr = get_config("addr")
         local data = path.absolute(get_config("data"))
@@ -70,20 +70,20 @@ target("satellite")
         table.join2(args, {"--addr", addr})
         -- Options that are set become environment variables; the others fall
         -- back to the component's own defaults.
-        for _, kv in ipairs({{"title", "SATELLITE_TITLE"}, {"accounts", "SATELLITE_ACCOUNTS"}, {"access", "SATELLITE_ACCESS"}}) do
+        for _, kv in ipairs({{"title", "FILES_TITLE"}, {"accounts", "FILES_ACCOUNTS"}, {"access", "FILES_ACCESS"}}) do
             local value = get_config(kv[1])
             if value ~= nil and value ~= "" then
                 table.join2(args, {"--env", kv[2] .. "=" .. value})
             end
         end
-        for _, name in ipairs({"SATELLITE_SECRET", "SATELLITE_MAX_UPLOAD", "SATELLITE_DEBUG"}) do
+        for _, name in ipairs({"FILES_SECRET", "FILES_MAX_UPLOAD", "FILES_DEBUG"}) do
             local value = os.getenv(name)
             if value ~= nil and value ~= "" then
                 table.join2(args, {"--env", name .. "=" .. value})
             end
         end
         table.join2(args, {"--dir", data .. "::/mnt/data", build.wasm})
-        cprint("${bright}Satellite Files${clear} on http://%s (serving %s)", addr, data)
+        cprint("${bright}Files${clear} on http://%s (serving %s)", addr, data)
         os.execv("wasmtime", args)
     end)
 
@@ -92,16 +92,16 @@ target("satellite")
     on_package(function (target)
         import("utils.archive")
         os.cd(os.projectdir())
-        local build = import("satellite.wasi").settings()
+        local build = import("files.wasi").settings()
         if not os.isfile(build.wasm) then
             raise("component not built at %s -- run `xmake` first", build.wasm)
         end
 
-        local stagedir = path.join(os.tmpdir(), "satellite-files-stage")
+        local stagedir = path.join(os.tmpdir(), "files-stage")
         os.tryrm(stagedir)
         os.mkdir(path.join(stagedir, "payload", "server"))
         os.cp("manifest.yaml", path.join(stagedir, "manifest.yaml"))
-        os.cp(build.wasm, path.join(stagedir, "payload", "server", "satellite.wasm"))
+        os.cp(build.wasm, path.join(stagedir, "payload", "server", "files.wasm"))
 
         -- xmake's archive picks the format from the extension (7z for
         -- anything unknown) and resolves a relative output against `curdir`:
@@ -112,7 +112,7 @@ target("satellite")
         local outfile = path.absolute("dist/files.satellite")
         local zipfile = outfile .. ".zip"
         os.tryrm(zipfile)
-        archive.archive(zipfile, {"manifest.yaml", "payload/server/satellite.wasm"}, {curdir = stagedir})
+        archive.archive(zipfile, {"manifest.yaml", "payload/server/files.wasm"}, {curdir = stagedir})
         os.tryrm(outfile)
         os.mv(zipfile, outfile)
         os.rmdir(stagedir)
@@ -132,9 +132,9 @@ task("e2e")
         import("core.project.config")
         config.load()
         os.cd(os.projectdir())
-        os.execv(os.programfile(), {"build", "satellite"})
-        local build = import("satellite.wasi").settings()
-        import("satellite.e2e")(build.wasm, build.wasmtime_flags, {
+        os.execv(os.programfile(), {"build", "files"})
+        local build = import("files.wasi").settings()
+        import("files.e2e")(build.wasm, build.wasmtime_flags, {
             keep = option.get("keep"),
             port = tonumber(option.get("port")),
         })
@@ -152,7 +152,7 @@ task("sysroot")
     set_category("plugin")
     on_run(function ()
         import("core.base.option")
-        import("satellite.sysroot")({
+        import("files.sysroot")({
             llvm = option.get("llvm"),
             llvm_src = option.get("llvm-src"),
             wasi_libc = option.get("wasi-libc"),

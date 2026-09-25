@@ -1,13 +1,13 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
 <title>{{TITLE}}</title>
-<link rel="icon" href="/.sf/icon.svg?v={{V}}" type="image/svg+xml">
-<link rel="stylesheet" href="/.sf/app.css?v={{V}}">
-<script>try{var t=localStorage.getItem('sf.theme');if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="icon" href="/.files/icon.svg?v={{V}}" type="image/svg+xml">
+<link rel="stylesheet" href="/.files/app.css?v={{V}}">
+<script>try{var t=localStorage.getItem('files.theme');if(t)document.documentElement.dataset.theme=t;if(localStorage.getItem('files.lang')==='en')document.documentElement.lang='en'}catch(e){}</script>
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -55,42 +55,43 @@
 
 <header class="topbar">
   <a class="brand" href="/" data-nav="/">
-    <img src="/.sf/icon.svg?v={{V}}" alt="" width="28" height="28">
+    <img src="/.files/icon.svg?v={{V}}" alt="" width="28" height="28">
     <span class="brand-name">{{TITLE}}</span>
   </a>
   <label class="search">
     <svg class="ic"><use href="#i-search"/></svg>
-    <input id="search" type="search" placeholder="Search this folder" autocomplete="off" spellcheck="false">
+    <input id="search" type="search" placeholder="搜索当前文件夹" data-i18n-placeholder="searchPlaceholder" autocomplete="off" spellcheck="false">
     <kbd>/</kbd>
   </label>
   <div class="top-actions">
-    <button class="icon-btn" id="theme-btn" title="Toggle theme"><svg class="ic"><use href="#i-moon"/></svg></button>
+    <button class="icon-btn lang-btn" id="lang-btn" title="Switch to English" data-i18n-title="language">EN</button>
+    <button class="icon-btn" id="theme-btn" title="切换主题" data-i18n-title="toggleTheme"><svg class="ic"><use href="#i-moon"/></svg></button>
     <div id="account"></div>
   </div>
 </header>
 
 <main class="page">
   <div class="bar">
-    <nav class="crumbs" id="crumbs" aria-label="Breadcrumb"></nav>
+    <nav class="crumbs" id="crumbs" aria-label="路径" data-i18n-aria="breadcrumb"></nav>
     <div class="tools" id="tools">
-      <button class="btn primary" id="upload-btn" hidden><svg class="ic"><use href="#i-upload"/></svg><span>Upload</span></button>
-      <button class="btn" id="mkdir-btn" hidden><svg class="ic"><use href="#i-folder-plus"/></svg><span>New folder</span></button>
+      <button class="btn primary" id="upload-btn" hidden><svg class="ic"><use href="#i-upload"/></svg><span data-i18n="upload">上传</span></button>
+      <button class="btn" id="mkdir-btn" hidden><svg class="ic"><use href="#i-folder-plus"/></svg><span data-i18n="newFolder">新建文件夹</span></button>
       <div class="menu-wrap">
-        <button class="icon-btn" id="more-btn" title="More"><svg class="ic"><use href="#i-more"/></svg></button>
+        <button class="icon-btn" id="more-btn" title="更多" data-i18n-title="more"><svg class="ic"><use href="#i-more"/></svg></button>
       </div>
-      <div class="seg" role="group" aria-label="View">
-        <button class="icon-btn" data-view="list" title="List view"><svg class="ic"><use href="#i-list"/></svg></button>
-        <button class="icon-btn" data-view="grid" title="Grid view"><svg class="ic"><use href="#i-grid"/></svg></button>
+      <div class="seg" role="group" aria-label="视图" data-i18n-aria="view">
+        <button class="icon-btn" data-view="list" title="列表视图" data-i18n-title="listView"><svg class="ic"><use href="#i-list"/></svg></button>
+        <button class="icon-btn" data-view="grid" title="网格视图" data-i18n-title="gridView"><svg class="ic"><use href="#i-grid"/></svg></button>
       </div>
     </div>
     <div class="selbar" id="selbar" hidden>
-      <button class="icon-btn" id="sel-clear" title="Clear selection"><svg class="ic"><use href="#i-x"/></svg></button>
+      <button class="icon-btn" id="sel-clear" title="取消选择" data-i18n-title="clearSelection"><svg class="ic"><use href="#i-x"/></svg></button>
       <span id="sel-count"></span>
       <span class="grow"></span>
-      <button class="btn ghost" data-act="download"><svg class="ic"><use href="#i-download"/></svg><span>Download</span></button>
-      <button class="btn ghost" data-act="rename"><svg class="ic"><use href="#i-pencil"/></svg><span>Rename</span></button>
-      <button class="btn ghost" data-act="move"><svg class="ic"><use href="#i-move"/></svg><span>Move</span></button>
-      <button class="btn ghost danger" data-act="delete"><svg class="ic"><use href="#i-trash"/></svg><span>Delete</span></button>
+      <button class="btn ghost" data-act="download"><svg class="ic"><use href="#i-download"/></svg><span data-i18n="download">下载</span></button>
+      <button class="btn ghost" data-act="rename"><svg class="ic"><use href="#i-pencil"/></svg><span data-i18n="rename">重命名</span></button>
+      <button class="btn ghost" data-act="move"><svg class="ic"><use href="#i-move"/></svg><span data-i18n="move">移动</span></button>
+      <button class="btn ghost danger" data-act="delete"><svg class="ic"><use href="#i-trash"/></svg><span data-i18n="del">删除</span></button>
     </div>
   </div>
 
@@ -98,12 +99,12 @@
   <p class="summary" id="summary"></p>
 </main>
 
-<div class="drop-overlay" id="drop"><div class="drop-card"><svg class="ic"><use href="#i-upload"/></svg><strong>Drop to upload</strong><span id="drop-dest"></span></div></div>
+<div class="drop-overlay" id="drop"><div class="drop-card"><svg class="ic"><use href="#i-upload"/></svg><strong data-i18n="dropToUpload">松开即可上传</strong><span id="drop-dest"></span></div></div>
 
 <aside class="uploads" id="uploads" hidden>
-  <header><strong id="up-title">Uploading</strong><span class="grow"></span>
-    <button class="icon-btn sm" id="up-toggle" title="Collapse"><svg class="ic"><use href="#i-down"/></svg></button>
-    <button class="icon-btn sm" id="up-close" title="Close"><svg class="ic"><use href="#i-x"/></svg></button></header>
+  <header><strong id="up-title"></strong><span class="grow"></span>
+    <button class="icon-btn sm" id="up-toggle" title="收起" data-i18n-title="collapse"><svg class="ic"><use href="#i-down"/></svg></button>
+    <button class="icon-btn sm" id="up-close" title="关闭" data-i18n-title="close"><svg class="ic"><use href="#i-x"/></svg></button></header>
   <div class="up-total"><div id="up-total-bar"></div></div>
   <ul id="up-list"></ul>
 </aside>
@@ -112,13 +113,13 @@
   <div class="pl-info"><div class="pl-art"><svg class="ic"><use href="#i-audio"/></svg></div><div class="pl-text"><strong id="pl-title"></strong><span id="pl-sub"></span></div></div>
   <div class="pl-main">
     <div class="pl-ctrls">
-      <button class="icon-btn" id="pl-prev" title="Previous"><svg class="ic"><use href="#i-prev"/></svg></button>
-      <button class="icon-btn pl-play" id="pl-play" title="Play/Pause"><svg class="ic"><use href="#i-pause"/></svg></button>
-      <button class="icon-btn" id="pl-next" title="Next"><svg class="ic"><use href="#i-next"/></svg></button>
+      <button class="icon-btn" id="pl-prev" title="上一个" data-i18n-title="previous"><svg class="ic"><use href="#i-prev"/></svg></button>
+      <button class="icon-btn pl-play" id="pl-play" title="播放/暂停" data-i18n-title="playPause"><svg class="ic"><use href="#i-pause"/></svg></button>
+      <button class="icon-btn" id="pl-next" title="下一个" data-i18n-title="next"><svg class="ic"><use href="#i-next"/></svg></button>
     </div>
     <div class="pl-seek"><span id="pl-cur">0:00</span><input type="range" id="pl-range" min="0" max="1000" value="0"><span id="pl-dur">0:00</span></div>
   </div>
-  <button class="icon-btn" id="pl-close" title="Close player"><svg class="ic"><use href="#i-x"/></svg></button>
+  <button class="icon-btn" id="pl-close" title="关闭播放器" data-i18n-title="closePlayer"><svg class="ic"><use href="#i-x"/></svg></button>
   <audio id="audio" preload="metadata"></audio>
 </div>
 
@@ -126,13 +127,13 @@
   <header>
     <div class="v-title"><strong id="v-name"></strong><span id="v-meta"></span></div>
     <span class="grow"></span>
-    <a class="icon-btn" id="v-open" target="_blank" rel="noopener" title="Open in new tab"><svg class="ic"><use href="#i-external"/></svg></a>
-    <a class="icon-btn" id="v-dl" title="Download"><svg class="ic"><use href="#i-download"/></svg></a>
-    <button class="icon-btn" id="v-close" title="Close (Esc)"><svg class="ic"><use href="#i-x"/></svg></button>
+    <a class="icon-btn" id="v-open" target="_blank" rel="noopener" title="在新标签页中打开" data-i18n-title="openNewTab"><svg class="ic"><use href="#i-external"/></svg></a>
+    <a class="icon-btn" id="v-dl" title="下载" data-i18n-title="download"><svg class="ic"><use href="#i-download"/></svg></a>
+    <button class="icon-btn" id="v-close" title="关闭（Esc）" data-i18n-title="closeEsc"><svg class="ic"><use href="#i-x"/></svg></button>
   </header>
-  <button class="v-nav prev" id="v-prev" title="Previous"><svg class="ic"><use href="#i-left"/></svg></button>
+  <button class="v-nav prev" id="v-prev" title="上一个" data-i18n-title="previous"><svg class="ic"><use href="#i-left"/></svg></button>
   <div class="v-body" id="v-body"></div>
-  <button class="v-nav next" id="v-next" title="Next"><svg class="ic"><use href="#i-right"/></svg></button>
+  <button class="v-nav next" id="v-next" title="下一个" data-i18n-title="next"><svg class="ic"><use href="#i-right"/></svg></button>
 </div>
 
 <div class="menu" id="menu" hidden></div>
@@ -140,6 +141,6 @@
 <input type="file" id="file-input" multiple hidden>
 <input type="file" id="dir-input" webkitdirectory multiple hidden>
 
-<script src="/.sf/app.js?v={{V}}"></script>
+<script src="/.files/app.js?v={{V}}"></script>
 </body>
 </html>

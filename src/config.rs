@@ -1,14 +1,14 @@
 //! Runtime configuration (read from environment variables) and access control.
 //!
-//! * `SATELLITE_TITLE`  – site name shown in the UI (default: "Satellite").
-//! * `SATELLITE_ACCOUNTS` – `user:password` pairs separated by commas.
-//! * `SATELLITE_ACCESS` – access rules, `;`-separated, each `PATH:WHO=PERMS,WHO=PERMS`.
+//! * `FILES_TITLE`  – site name shown in the UI (default: "Files").
+//! * `FILES_ACCOUNTS` – `user:password` pairs separated by commas.
+//! * `FILES_ACCESS` – access rules, `;`-separated, each `PATH:WHO=PERMS,WHO=PERMS`.
 //!   `WHO` is `*` (everyone), `@acct` (any signed-in user) or a user name.
 //!   `PERMS` is any combination of `r` (read), `w` (upload / new folder),
 //!   `m` (move / rename) and `d` (delete). The longest matching path wins.
-//! * `SATELLITE_SECRET` – key used to sign session cookies.
-//! * `SATELLITE_MAX_UPLOAD` – optional upload size limit in MiB (0 = unlimited).
-//! * `SATELLITE_DEBUG` – when set, every request is logged to stderr.
+//! * `FILES_SECRET` – key used to sign session cookies.
+//! * `FILES_MAX_UPLOAD` – optional upload size limit in MiB (0 = unlimited).
+//! * `FILES_DEBUG` – when set, every request is logged to stderr.
 
 use hmac::{Hmac, KeyInit, Mac};
 use sha2::{Digest, Sha256};
@@ -75,9 +75,9 @@ impl Config {
         let env: Vec<(String, String)> = wasip3::cli::environment::get_environment();
         let get = |k: &str| env.iter().find(|(n, _)| n == k).map(|(_, v)| v.clone());
 
-        let title = get("SATELLITE_TITLE").filter(|s| !s.trim().is_empty()).unwrap_or_else(|| "Satellite".into());
+        let title = get("FILES_TITLE").filter(|s| !s.trim().is_empty()).unwrap_or_else(|| "Files".into());
 
-        let accounts: Vec<(String, String)> = get("SATELLITE_ACCOUNTS")
+        let accounts: Vec<(String, String)> = get("FILES_ACCOUNTS")
             .unwrap_or_default()
             .split(',')
             .filter_map(|pair| {
@@ -90,7 +90,7 @@ impl Config {
             })
             .collect();
 
-        let access = get("SATELLITE_ACCESS").filter(|s| !s.trim().is_empty()).unwrap_or_else(|| {
+        let access = get("FILES_ACCESS").filter(|s| !s.trim().is_empty()).unwrap_or_else(|| {
             if accounts.is_empty() {
                 "/:*=rwmd".into()
             } else {
@@ -113,20 +113,20 @@ impl Config {
             })
             .collect();
 
-        let secret = match get("SATELLITE_SECRET") {
+        let secret = match get("FILES_SECRET") {
             Some(s) if !s.is_empty() => s.into_bytes(),
             // Stable across instances, and rotates whenever any account changes.
             _ => {
                 let mut h = Sha256::new();
-                h.update(b"satellite-files/session-key/v1\0");
-                h.update(get("SATELLITE_ACCOUNTS").unwrap_or_default().as_bytes());
+                h.update(b"files/session-key/v1\0");
+                h.update(get("FILES_ACCOUNTS").unwrap_or_default().as_bytes());
                 h.finalize().to_vec()
             }
         };
 
-        let max_upload = get("SATELLITE_MAX_UPLOAD").and_then(|v| v.trim().parse::<u64>().ok()).unwrap_or(0) * 1024 * 1024;
+        let max_upload = get("FILES_MAX_UPLOAD").and_then(|v| v.trim().parse::<u64>().ok()).unwrap_or(0) * 1024 * 1024;
 
-        let debug = get("SATELLITE_DEBUG").is_some();
+        let debug = get("FILES_DEBUG").is_some();
 
         Config { title, accounts, rules, secret, max_upload, debug }
     }

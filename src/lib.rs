@@ -1,4 +1,4 @@
-//! Satellite Files — a clean, modern file server built as a WASIp3 HTTP component.
+//! Files — a clean, modern file server built as a WASIp3 HTTP component.
 
 mod config;
 mod fs;
@@ -30,7 +30,7 @@ impl wasip3::exports::http::handler::Guest for App {
     }
 }
 
-const SESSION_COOKIE: &str = "sf_session";
+const SESSION_COOKIE: &str = "files_session";
 const SESSION_TTL: i64 = 30 * 24 * 3600;
 const SEARCH_LIMIT: usize = 500;
 const WALK_LIMIT: usize = 20_000;
@@ -89,7 +89,7 @@ async fn route(req: Request) -> Resp {
         return Resp::error_msg(Status::FORBIDDEN, "Missing X-Requested-With header");
     }
 
-    if let Some(rest) = raw.strip_prefix("/.sf/") {
+    if let Some(rest) = raw.strip_prefix("/.files/") {
         let rest = rest.split('?').next().unwrap_or("");
         return internal(&ctx, &method, rest, req).await;
     }
@@ -114,7 +114,7 @@ async fn route(req: Request) -> Resp {
 }
 
 // ---------------------------------------------------------------------------
-// Built-in endpoints under /.sf/
+// Built-in endpoints under /.files/
 // ---------------------------------------------------------------------------
 
 fn asset_etag() -> String {
@@ -241,7 +241,7 @@ async fn get(ctx: &Ctx, t: &Target) -> Resp {
                         let mut child = t.segs.clone();
                         child.push(e.name.clone());
                         // Hide entries the user can't do anything with, and our temp files.
-                        if !ctx.perms(&child).any() || e.name.ends_with(".sfpart") {
+                        if !ctx.perms(&child).any() || e.name.ends_with(".filespart") {
                             continue;
                         }
                         entries.push(json!({ "name": e.name, "dir": e.dir, "size": e.size, "mtime": e.mtime }));
@@ -383,7 +383,7 @@ async fn walk(ctx: &Ctx, vfs: &Vfs, root: &[String], mut visit: impl FnMut(&[Str
         for e in list {
             let mut p = dir.clone();
             p.push(e.name.clone());
-            if !ctx.perms(&p).read || e.name.ends_with(".sfpart") {
+            if !ctx.perms(&p).read || e.name.ends_with(".filespart") {
                 continue;
             }
             if !visit(&p, &e) {
@@ -498,7 +498,7 @@ async fn upload(ctx: &Ctx, t: &Target, req: Request) -> Resp {
     let Some(name) = t.segs.last().cloned() else {
         return Resp::error(Status::BAD_REQUEST);
     };
-    if name.ends_with(".sfpart") {
+    if name.ends_with(".filespart") {
         return Resp::error(Status::BAD_REQUEST);
     }
     let perms = ctx.perms(&t.segs);
@@ -529,7 +529,7 @@ async fn upload(ctx: &Ctx, t: &Target, req: Request) -> Resp {
         Err(s) => return Resp::error(s),
     };
     let rand = wasip3::random::random::get_random_u64();
-    let tmp = format!(".{name}.{rand:x}.sfpart");
+    let tmp = format!(".{name}.{rand:x}.filespart");
     use wasip3::filesystem::types::{DescriptorFlags, OpenFlags, PathFlags};
     let file = match dir
         .open_at(PathFlags::empty(), tmp.clone(), OpenFlags::CREATE | OpenFlags::EXCLUSIVE, DescriptorFlags::WRITE)

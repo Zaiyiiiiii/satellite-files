@@ -1,12 +1,12 @@
 [package]
-name = "satellite-files"
+name = "files"
 version = "0.1.0"
 edition = "2024"
 description = "A clean, modern file server running as a WASIp3 (wasi:http@0.3) component"
 license = "MIT"
 
 [lib]
-name = "satellite"
+name = "files"
 crate-type = ["cdylib"]
 
 [dependencies]

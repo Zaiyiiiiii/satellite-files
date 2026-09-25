@@ -2,7 +2,7 @@
 function settings()
     return {
         cargo = {"+nightly", "build", "-Zbuild-std=std,panic_abort", "--target", "wasm32-wasip3", "--release"},
-        wasm = "target/wasm32-wasip3/release/satellite.wasm",
+        wasm = "target/wasm32-wasip3/release/files.wasm",
         wasmtime_flags = {"-Wcomponent-model-threading=y"},
     }
 end
