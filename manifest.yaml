@@ -17,8 +17,7 @@ services:
         presentation:
           description: Web 界面与文件的上传/下载接口。没有配置账号时所有人都能读写，暴露到公网前请先设置 SATELLITE_ACCOUNTS
 
-      # 声明了 private path，planet 就把 app 的持久化目录挂到 `/`，
-      # 组件把它作为根卷对外提供。
+      # 组件从 /mnt/data 读取对外提供的文件。
       - id: data
         type: path
         source: user

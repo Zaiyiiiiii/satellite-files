@@ -99,7 +99,7 @@ local function start_server(wasm, flags, port)
         "--env", "SATELLITE_ACCOUNTS=alice:secret,bob:hunter2",
         "--env", "SATELLITE_ACCESS=/:*=r,@acct=rw,alice=rwmd;/inbox:*=w,alice=rwmd;/private:alice=rwmd",
         "--env", "SATELLITE_MAX_UPLOAD=8",
-        "--dir", DATA .. "::/",
+        "--dir", DATA .. "::/mnt/data",
         wasm,
     })
     local logfile = path.join(TMP, "serve.log")

@@ -82,7 +82,7 @@ target("satellite")
                 table.join2(args, {"--env", name .. "=" .. value})
             end
         end
-        table.join2(args, {"--dir", data .. "::/", build.wasm})
+        table.join2(args, {"--dir", data .. "::/mnt/data", build.wasm})
         cprint("${bright}Satellite Files${clear} on http://%s (serving %s)", addr, data)
         os.execv("wasmtime", args)
     end)

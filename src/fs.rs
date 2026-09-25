@@ -1,7 +1,7 @@
 //! A small virtual file system on top of the WASI preopened directories.
 //!
-//! Every preopen becomes a "volume" mounted at its guest path. A preopen at
-//! `/` (or `.`) is the root volume; others appear as folders in the tree.
+//! Every preopen becomes a "volume" mounted at its guest path. URL paths are
+//! resolved below [`DATA_ROOT`]: `/` in the URL is `/mnt/data` in the guest.
 
 use wasip3::filesystem::preopens::get_directories;
 use wasip3::filesystem::types::{
@@ -10,8 +10,18 @@ use wasip3::filesystem::types::{
 
 use crate::http::Status;
 
+/// Guest directory that the URL root maps to.
+pub const DATA_ROOT: &str = "/mnt/data";
+
 pub struct Vfs {
     vols: Vec<(Vec<String>, Descriptor)>,
+}
+
+/// Guest path segments for URL path segments.
+fn guest(segs: &[String]) -> Vec<String> {
+    let mut g: Vec<String> = DATA_ROOT.split('/').filter(|s| !s.is_empty()).map(String::from).collect();
+    g.extend_from_slice(segs);
+    g
 }
 
 /// A resolved location inside the virtual tree.
@@ -78,6 +88,7 @@ impl Vfs {
     }
 
     pub fn resolve(&self, segs: &[String]) -> Option<Loc<'_>> {
+        let segs = &guest(segs)[..];
         let best = self
             .vols
             .iter()
@@ -96,6 +107,7 @@ impl Vfs {
 
     /// Names of volumes mounted directly below `segs`.
     fn mounts_below(&self, segs: &[String]) -> Vec<String> {
+        let segs = &guest(segs)[..];
         let mut v: Vec<String> = self
             .vols
             .iter()

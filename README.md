@@ -71,11 +71,11 @@ cargo +nightly build -Zbuild-std=std,panic_abort --target wasm32-wasip3 --releas
 wasmtime serve -Scli -Sp3 -Wcomponent-model-threading=y \
   --addr 127.0.0.1:8080 \
   --env SATELLITE_TITLE="My Files" --env SATELLITE_ACCOUNTS=alice:secret \
-  --dir ./data::/ \
+  --dir ./data::/mnt/data \
   target/wasm32-wasip3/release/satellite.wasm
 ```
 
-每个 `--dir 宿主目录::组件内路径` 都是一个卷：挂在 `/` 的是根卷，挂在其他路径（例如 `--dir ~/Music::/music`）的会作为文件夹出现在对应位置。
+组件对外的根目录是组件内的 `/mnt/data`，所以数据目录要挂到这里（`--dir 宿主目录::/mnt/data`）。挂在 `/mnt/data` 下面的其他目录（例如 `--dir ~/Music::/mnt/data/music`）会作为文件夹出现在对应位置。
 
 ### 配置
 
@@ -110,7 +110,7 @@ wasmtime serve -Scli -Sp3 -Wcomponent-model-threading=y \
 
 - 服务 `server`，wasmtime handler，常驻实例（`http-resident`）
 - `http`：Web 界面和上传/下载接口共用的端口
-- `data`：私有目录。planet 会把 app 的持久化目录挂到 `/`，组件把它作为根卷对外提供
+- `data`：数据目录，组件从 `/mnt/data` 读取对外提供的文件
 - `SATELLITE_TITLE`、`SATELLITE_ACCOUNTS`、`SATELLITE_ACCESS`、`SATELLITE_SECRET`、`SATELLITE_MAX_UPLOAD`：同上表，不设置时用默认值（planet 把配置项按 `id` 注入成同名环境变量）
 - 协作线程 ABI 需要 planet 的 wasmtime host 打开 component-model threading（相当于 `-Wcomponent-model-threading=y`）
 
