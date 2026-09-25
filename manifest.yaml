@@ -1,0 +1,62 @@
+schemaVersion: v1
+id: files
+metadata:
+  name: Satellite Files
+  version: "0.1.0"
+  description: 简洁现代的文件服务器：浏览、拖拽上传、预览、音乐播放、打包下载，可选账号与按路径的读写权限
+
+services:
+  - id: server
+    handler: wasmtime
+    config:
+      - id: http
+        type: port
+        protocol: tcp
+        target: 8080
+        entrance: true
+        presentation:
+          description: Web 界面与文件的上传/下载接口。没有配置账号时所有人都能读写，暴露到公网前请先设置 SATELLITE_ACCOUNTS
+
+      # 声明了 private path，planet 就把 app 的持久化目录挂到 `/`，
+      # 组件把它作为根卷对外提供。
+      - id: data
+        type: path
+        source: private
+        access: read-write
+        presentation:
+          description: 对外提供的文件都在这个目录里，丢了就等于丢了所有文件
+
+      # 以下各项不给默认值：没有设置时 planet 不注入，应用用它自己的默认值。
+      - id: SATELLITE_TITLE
+        type: string
+        presentation:
+          description: 页面上显示的站点名称（不设置时为 Satellite）
+
+      - id: SATELLITE_ACCOUNTS
+        type: string
+        presentation:
+          description: 账号列表，格式为 user:password,user:password。不设置时不需要登录，所有人都可以读写
+
+      - id: SATELLITE_ACCESS
+        type: string
+        presentation:
+          description: 按路径的访问规则，例如 "/:*=r,@acct=rwmd;/inbox:*=w,alice=rwmd"。不设置时：没有账号为 /:*=rwmd，有账号为 /:*=r,@acct=rwmd
+
+      - id: SATELLITE_SECRET
+        type: string
+        presentation:
+          description: 会话 Cookie 的签名密钥。不设置时由账号列表派生，修改任意密码后所有会话都会失效
+
+      - id: SATELLITE_MAX_UPLOAD
+        type: string
+        presentation:
+          description: 单个文件的上传上限（MiB），不设置或为 0 时不限制
+
+    handlerSettings:
+      component: satellite.wasm
+      # 常驻实例：不必每个请求都重新实例化组件，大文件的流式上传/下载
+      # 与其他请求在同一个实例里并发进行。
+      mode: http-resident
+      # 组件本身无状态（会话是签名 Cookie，上传先写临时文件再重命名），
+      # 一个实例就足够；这里与 simple-git-server 保持一致。
+      instances: 1

@@ -1,17 +1,21 @@
 [package]
 name = "satellite-files"
 version = "0.1.0"
-edition = "2021"
-rust-version = "1.98"
-description = "A clean, modern file server running as a WASIp3 HTTP component"
+edition = "2024"
+description = "A clean, modern file server running as a WASIp3 (wasi:http@0.3) component"
 license = "MIT"
 
 [lib]
+name = "satellite"
 crate-type = ["cdylib"]
 
 [dependencies]
 wasip3 = { version = "0.9.0", features = ["async-spawn"] }
-serde = { version = "1", features = ["derive"] }
+# On wasm32-wasip3, wit-bindgen's default task-context storage is a C `_Thread_local`
+# in a prebuilt object that was compiled without TLS, so it is shared by all tasks and
+# concurrent requests trip `assertion failed: task_state::get().is_null()`. The `std`
+# feature stores it in a Rust `thread_local!` instead, which is per task.
+wit-bindgen = { version = "0.62", default-features = false, features = ["std"] }
 serde_json = "1"
 sha2 = "0.11"
 hmac = "0.13"

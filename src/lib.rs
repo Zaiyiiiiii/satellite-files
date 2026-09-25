@@ -77,6 +77,9 @@ async fn route(req: Request) -> Resp {
         .filter_map(|c| c.trim().split_once('='))
         .find(|(k, _)| *k == SESSION_COOKIE)
         .and_then(|(_, v)| cfg.verify_session(v, now));
+    if cfg.debug {
+        eprintln!("{method:?} {raw} user={user:?}");
+    }
     let ctx = Ctx { cfg, user, headers, now };
 
     // State-changing requests must come from our own UI: browsers never attach

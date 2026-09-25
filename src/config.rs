@@ -1,13 +1,14 @@
 //! Runtime configuration (read from environment variables) and access control.
 //!
-//! * `SF_TITLE`    – site name shown in the UI (default: "Satellite").
-//! * `SF_ACCOUNTS` – `user:password` pairs separated by commas.
-//! * `SF_ACCESS`   – access rules, `;`-separated, each `PATH:WHO=PERMS,WHO=PERMS`.
+//! * `SATELLITE_TITLE`  – site name shown in the UI (default: "Satellite").
+//! * `SATELLITE_ACCOUNTS` – `user:password` pairs separated by commas.
+//! * `SATELLITE_ACCESS` – access rules, `;`-separated, each `PATH:WHO=PERMS,WHO=PERMS`.
 //!   `WHO` is `*` (everyone), `@acct` (any signed-in user) or a user name.
 //!   `PERMS` is any combination of `r` (read), `w` (upload / new folder),
 //!   `m` (move / rename) and `d` (delete). The longest matching path wins.
-//! * `SF_SECRET`   – key used to sign session cookies.
-//! * `SF_MAX_UPLOAD` – optional upload size limit in MiB (0 = unlimited).
+//! * `SATELLITE_SECRET` – key used to sign session cookies.
+//! * `SATELLITE_MAX_UPLOAD` – optional upload size limit in MiB (0 = unlimited).
+//! * `SATELLITE_DEBUG` – when set, every request is logged to stderr.
 
 use hmac::{Hmac, KeyInit, Mac};
 use sha2::{Digest, Sha256};
@@ -66,6 +67,7 @@ pub struct Config {
     rules: Vec<Rule>,
     secret: Vec<u8>,
     pub max_upload: u64,
+    pub debug: bool,
 }
 
 impl Config {
@@ -73,9 +75,9 @@ impl Config {
         let env: Vec<(String, String)> = wasip3::cli::environment::get_environment();
         let get = |k: &str| env.iter().find(|(n, _)| n == k).map(|(_, v)| v.clone());
 
-        let title = get("SF_TITLE").filter(|s| !s.trim().is_empty()).unwrap_or_else(|| "Satellite".into());
+        let title = get("SATELLITE_TITLE").filter(|s| !s.trim().is_empty()).unwrap_or_else(|| "Satellite".into());
 
-        let accounts: Vec<(String, String)> = get("SF_ACCOUNTS")
+        let accounts: Vec<(String, String)> = get("SATELLITE_ACCOUNTS")
             .unwrap_or_default()
             .split(',')
             .filter_map(|pair| {
@@ -88,7 +90,7 @@ impl Config {
             })
             .collect();
 
-        let access = get("SF_ACCESS").filter(|s| !s.trim().is_empty()).unwrap_or_else(|| {
+        let access = get("SATELLITE_ACCESS").filter(|s| !s.trim().is_empty()).unwrap_or_else(|| {
             if accounts.is_empty() {
                 "/:*=rwmd".into()
             } else {
@@ -111,20 +113,22 @@ impl Config {
             })
             .collect();
 
-        let secret = match get("SF_SECRET") {
+        let secret = match get("SATELLITE_SECRET") {
             Some(s) if !s.is_empty() => s.into_bytes(),
             // Stable across instances, and rotates whenever any account changes.
             _ => {
                 let mut h = Sha256::new();
                 h.update(b"satellite-files/session-key/v1\0");
-                h.update(get("SF_ACCOUNTS").unwrap_or_default().as_bytes());
+                h.update(get("SATELLITE_ACCOUNTS").unwrap_or_default().as_bytes());
                 h.finalize().to_vec()
             }
         };
 
-        let max_upload = get("SF_MAX_UPLOAD").and_then(|v| v.trim().parse::<u64>().ok()).unwrap_or(0) * 1024 * 1024;
+        let max_upload = get("SATELLITE_MAX_UPLOAD").and_then(|v| v.trim().parse::<u64>().ok()).unwrap_or(0) * 1024 * 1024;
 
-        Config { title, accounts, rules, secret, max_upload }
+        let debug = get("SATELLITE_DEBUG").is_some();
+
+        Config { title, accounts, rules, secret, max_upload, debug }
     }
 
     pub fn has_accounts(&self) -> bool {

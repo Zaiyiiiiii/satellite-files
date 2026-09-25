@@ -141,15 +141,13 @@ pub async fn pipe(src: &mut StreamReader<u8>, dst: &mut StreamWriter<u8>, limit:
             break;
         }
     }
-    if pad {
-        if let Some(l) = limit {
-            while copied < l {
-                let n = ((l - copied) as usize).min(CHUNK);
-                if !dst.write_all(vec![0u8; n]).await.is_empty() {
-                    return Err(());
-                }
-                copied += n as u64;
+    if pad && let Some(l) = limit {
+        while copied < l {
+            let n = ((l - copied) as usize).min(CHUNK);
+            if !dst.write_all(vec![0u8; n]).await.is_empty() {
+                return Err(());
             }
+            copied += n as u64;
         }
     }
     Ok(copied)
