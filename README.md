@@ -138,6 +138,16 @@ xmake e2e             # 加 --keep 可以保留测试数据目录
 - 24 个并发请求（覆盖 wasm32-wasip3 下 wit-bindgen 任务上下文的问题，见 `Cargo.toml`）
 - 删除文件夹、禁止删除根目录、退出登录
 
+## 持续集成与发布
+
+`.github/workflows/build.yml` 在每次推送和 PR 时用 xmake 构建组件、跑 `xmake e2e`、打包 `dist/files.satellite`，产物上传为 workflow artifact。
+
+发布新版本：
+1. 把 `Cargo.toml`、`xmake.lua`、`manifest.yaml` 里的版本号改成新版本，在 `CHANGELOG.md` 里加一节 `## vX.Y.Z`
+2. 推送 tag `vX.Y.Z`
+
+workflow 会检查版本号和 tag 是否一致，构建并测试通过后创建 GitHub Release，附带 `files.satellite`、`files.wasm` 和 `SHA256SUMS`，说明取自 `CHANGELOG.md` 中对应的一节。
+
 ## HTTP 接口
 
 Web 界面使用的是一组很小的 HTTP 接口，也可以直接用 `curl` 调用。修改类请求必须带 `X-Requested-With` 头（用于防御 CSRF）。

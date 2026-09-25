@@ -1,0 +1,105 @@
+name: Build
+
+# Every push and pull request: build the WASIp3 component with xmake, run the
+# end-to-end tests under wasmtime and package dist/files.satellite.
+# A pushed tag `vX.Y.Z` additionally publishes a GitHub release with the
+# artifacts and the matching section of CHANGELOG.md.
+
+on:
+  push:
+    branches: ["**"]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+env:
+  WASMTIME_VERSION: "49.0.1"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up xmake
+        uses: xmake-io/github-action-setup-xmake@v1
+        with:
+          xmake-version: latest
+
+      # `xmake` installs the nightly toolchain with rust-src and the vendored
+      # WASIp3 C runtime itself (xmake/modules/files/runtime.lua).
+      - name: Install Rust nightly
+        run: rustup toolchain install nightly --profile minimal --component rust-src
+
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+
+      - name: Install wasmtime ${{ env.WASMTIME_VERSION }}
+        run: |
+          name="wasmtime-v${WASMTIME_VERSION}-x86_64-linux"
+          curl -fsSL "https://github.com/bytecodealliance/wasmtime/releases/download/v${WASMTIME_VERSION}/${name}.tar.xz" | tar -xJ -C "$RUNNER_TEMP"
+          echo "$RUNNER_TEMP/${name}" >> "$GITHUB_PATH"
+
+      - name: Check versions match the tag
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          want="${GITHUB_REF_NAME#v}"
+          grep -q "^version = \"${want}\"" Cargo.toml || { echo "Cargo.toml version is not ${want}"; exit 1; }
+          grep -q "set_version(\"${want}\")" xmake.lua || { echo "xmake.lua version is not ${want}"; exit 1; }
+          grep -q "version: \"${want}\"" manifest.yaml || { echo "manifest.yaml version is not ${want}"; exit 1; }
+          grep -q "^## ${GITHUB_REF_NAME}$" CHANGELOG.md || { echo "CHANGELOG.md has no ## ${GITHUB_REF_NAME} section"; exit 1; }
+
+      - name: Build
+        run: |
+          xmake --version
+          wasmtime --version
+          xmake f -y
+          xmake -v
+
+      - name: End-to-end tests
+        run: xmake e2e
+
+      - name: Package
+        run: |
+          xmake package
+          mkdir -p out
+          cp dist/files.satellite target/wasm32-wasip3/release/files.wasm out/
+          (cd out && sha256sum files.satellite files.wasm > SHA256SUMS && cat SHA256SUMS)
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: files
+          path: out/
+          if-no-files-found: error
+
+  release:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: files
+          path: out
+
+      - name: Release notes from CHANGELOG.md
+        run: |
+          awk -v tag="## ${GITHUB_REF_NAME}" '
+            $0 == tag { on = 1; next }
+            on && /^## / { exit }
+            on { print }
+          ' CHANGELOG.md > notes.md
+          cat notes.md
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          name: Files ${{ github.ref_name }}
+          body_path: notes.md
+          files: |
+            out/files.satellite
+            out/files.wasm
+            out/SHA256SUMS
